@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKADUTA Smart Agriculture</title>
+    <!-- Library Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Solid Dark & Green Palette (No gradients, high contrast) */
+            --bg-page: #0a0d0c;
+            --bg-surface: #111714;
+            --bg-card: #151d18;
+            --bg-card-hover: #1b2620;
+            --border-subtle: #223128;
+            --border-strong: #2f4236;
+
+            --green-primary: #10b981;
+            --green-hover: #059669;
+            --green-active: #047857;
+            --green-muted: #133827;
+            --green-text: #34d399;
+
+            --status-off: #2a352f;
+            --status-warning: #eab308;
+            --status-danger: #ef4444;
+
+            --text-main: #f0fdf4;
+            --text-secondary: #9cb3a4;
+            --text-muted: #6b8073;
+
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            letter-spacing: -0.01em;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--green-text);
+        }
+
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--green-primary);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .logo span {
+            color: var(--green-primary);
+        }
+
+        .sidebar-menu {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid transparent;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .nav-item.active {
+            background-color: var(--green-muted);
+            color: var(--green-text);
+            border-color: var(--green-primary);
+            font-weight: 600;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .system-meta {
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 16px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            flex: 1;
+            padding: 28px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            background-color: var(--bg-page);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .header-title-box h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .header-title-box p {
+            margin: 4px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .connection-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--status-warning);
+        }
+
+        /* Section Title */
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        /* Relay Controls Grid */
+        .relay-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .relay-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .relay-card:hover {
+            border-color: var(--border-strong);
+        }
+
+        .relay-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .relay-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .relay-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Flat Switch Button */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--status-off);
+            transition: background-color 0.2s ease;
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-main);
+            transition: transform 0.2s ease;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--green-primary);
+            border-color: var(--green-hover);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            background-color: #051a11;
+        }
+
+        input:focus-visible + .slider {
+            outline: 2px solid var(--green-primary);
+            outline-offset: 2px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.6fr 1.1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 300px;
+        }
+
+        .data-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .card-badge {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Gauges Container */
+        .gauges-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex: 1;
+            padding-top: 8px;
+        }
+
+        .gauge-item {
+            text-align: center;
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gauge-item-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .gauge-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 180px;
+            margin: auto;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: 18%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Status List */
+        .status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+        }
+
+        .status-label {
+            color: var(--text-secondary);
+        }
+
+        .status-pill {
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            background-color: var(--green-muted);
+            color: var(--green-text);
+            border: 1px solid var(--green-hover);
+        }
+
+        @media (max-width: 1080px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="sidebar">
+        <div>
+            <div class="brand">
+                <div class="brand-badge">
+                    <span class="brand-dot"></span>
+                    <span>IoT Station</span>
+                </div>
+                <div class="logo">SKADUTA <span>Hidroponik</span></div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="nav-item active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>Monitoring Panel</span>
+                </div>
+            </nav>
+        </div>
+
+        <div class="system-meta">
+            <div><strong>Sistem:</strong> Sucodeponik v1.0</div>
+            <div><strong>Status Server:</strong> Aktif</div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <header class="header">
+            <div class="header-title-box">
+                <h1>Panel Kendali & Telemetri</h1>
+                <p>Otomasi dan pemantauan nutrisi hidroponik presisi</p>
+            </div>
+            <div class="connection-indicator">
+                <span class="indicator-dot" id="db-dot"></span>
+                <span id="db-status" style="color: var(--text-secondary);">Menghubungkan...</span>
+            </div>
+        </header>
+
+        <!-- Sakelar Relay -->
+        <section>
+            <div class="section-label">Aktuator Pompa Otomatis</div>
+            <div class="relay-container">
+                <div class="relay-card">
+                    <div class="relay-info">
+                        <span class="relay-title">Pompa pH Up</span>
+                        <span class="relay-sub">Koreksi Asam</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="relay1" onchange="toggleRelay('relay1', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="relay-card">
+                    <div class="relay-info">
+                        <span class="relay-title">Pompa pH Down</span>
+                        <span class="relay-sub">Koreksi Basa</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="relay2" onchange="toggleRelay('relay2', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="relay-card">
+                    <div class="relay-info">
+                        <span class="relay-title">Pompa Nutrisi A</span>
+                        <span class="relay-sub">Makro Nutrien</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="relay3" onchange="toggleRelay('relay3', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="relay-card">
+                    <div class="relay-info">
+                        <span class="relay-title">Pompa Nutrisi B</span>
+                        <span class="relay-sub">Mikro Nutrien</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="relay4" onchange="toggleRelay('relay4', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Monitoring -->
+        <section style="display:flex; flex-direction:column; flex:1;">
+            <div class="section-label">Telemetri Sensor Realtime</div>
+            <div class="dashboard-grid">
+                <div class="data-card">
+                    <div class="card-header">
+                        <span class="card-title">Riwayat pH & TDS</span>
+                        <span class="card-badge">Realtime Stream</span>
+                    </div>
+                    <div style="position: relative; flex: 1; min-height: 220px;">
+                        <canvas id="sensorGraph"></canvas>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="card-header">
+                        <span class="card-title">Nilai Sensor Terkini</span>
+                        <span class="card-badge">Gauge</span>
+                    </div>
+                    <div class="gauges-inner">
+                        <div class="gauge-item">
+                            <span class="gauge-item-title">Kadar pH</span>
+                            <div class="gauge-wrapper">
+                                <canvas id="phGauge"></canvas>
+                                <div class="gauge-value" id="phText" style="color: var(--green-primary);">0.0</div>
+                            </div>
+                        </div>
+                        <div class="gauge-item">
+                            <span class="gauge-item-title">Konduktivitas TDS</span>
+                            <div class="gauge-wrapper">
+                                <canvas id="tdsGauge"></canvas>
+                                <div class="gauge-value" id="tdsText" style="color: var(--text-main);">0 PPM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="card-header">
+                        <span class="card-title">Kondisi Larutan</span>
+                        <span class="card-badge">Status</span>
+                    </div>
+                    <div class="status-list">
+                        <div class="status-row">
+                            <span class="status-label">Terakhir Update</span>
+                            <strong id="last-update" style="color: var(--text-main);">-</strong>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Status pH</span>
+                            <span class="status-pill" id="ph-status">Normal</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Status TDS</span>
+                            <span class="status-pill" id="tds-status">Optimal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Integrasi SDK Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Konfigurasi Firebase dari project sucodeponik
+        const firebaseConfig = {
+            apiKey: "AIzaSyADWJLpXaQLIB7rcV31C8wm2fG54CE18JE",
+            authDomain: "sucodeponik.firebaseapp.com",
+            databaseURL: "https://sucodeponik-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sucodeponik",
+            storageBucket: "sucodeponik.firebasestorage.app",
+            messagingSenderId: "799876872137",
+            appId: "1:799876872137:web:8e8ef36510a76d75301a18",
+            measurementId: "G-BD66Y8M3FR"
+        };
+
+        // Inisialisasi Firebase & Realtime Database
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Fungsi kontrol relay ke Firebase
+        window.toggleRelay = function (relayId, isChecked) {
+            set(ref(database, 'agriculture_iot/relays/' + relayId), isChecked)
+                .then(() => console.log(`Berhasil update ${relayId}: ${isChecked}`))
+                .catch(error => console.error("Error update relay:", error));
+        };
+
+        // Inisialisasi Chart Line dengan skema hijau-hitam tanpa gradasi
+        const ctxGraph = document.getElementById('sensorGraph').getContext('2d');
+        const sensorChart = new Chart(ctxGraph, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'pH Air',
+                        data: [],
+                        borderColor: '#10b981',
+                        backgroundColor: '#10b981',
+                        borderWidth: 2,
+                        yAxisID: 'yPh',
+                        tension: 0.1,
+                        pointRadius: 2
+                    },
+                    {
+                        label: 'TDS (PPM)',
+                        data: [],
+                        borderColor: '#34d399',
+                        backgroundColor: '#34d399',
+                        borderWidth: 1.8,
+                        borderDash: [4, 4],
+                        yAxisID: 'yTds',
+                        tension: 0.1,
+                        pointRadius: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: { color: '#223128' },
+                        ticks: { color: '#6b8073', font: { family: 'Plus Jakarta Sans', size: 10 } }
+                    },
+                    yPh: {
+                        type: 'linear',
+                        position: 'left',
+                        min: 0,
+                        max: 14,
+                        grid: { color: '#223128' },
+                        ticks: { color: '#10b981', font: { family: 'Plus Jakarta Sans', size: 10 } },
+                        title: { display: true, text: 'pH', color: '#10b981' }
+                    },
+                    yTds: {
+                        type: 'linear',
+                        position: 'right',
+                        min: 0,
+                        max: 2000,
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#34d399', font: { family: 'Plus Jakarta Sans', size: 10 } },
+                        title: { display: true, text: 'TDS (PPM)', color: '#34d399' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#9cb3a4',
+                            font: { family: 'Plus Jakarta Sans', size: 12 },
+                            boxWidth: 14
+                        }
+                    }
+                }
+            }
+        });
+
+        // Inisialisasi Gauge dengan solid hijau dan solid hitam
+        function createGauge(elementId, strokeColor) {
+            return new Chart(document.getElementById(elementId).getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: [strokeColor, '#111714'],
+                        borderColor: '#223128',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    rotation: -135,
+                    circumference: 270,
+                    cutout: '78%',
+                    responsive: true,
+                    plugins: {
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+
+        const phGaugeChart = createGauge('phGauge', '#10b981');
+        const tdsGaugeChart = createGauge('tdsGauge', '#34d399');
+
+        // Mendengarkan data Realtime dari Firebase
+        const iotRef = ref(database, 'agriculture_iot');
+        onValue(iotRef, (snapshot) => {
+            const data = snapshot.val();
+            const statusElem = document.getElementById('db-status');
+            const statusDot = document.getElementById('db-dot');
+            if (statusElem) {
+                statusElem.innerText = "Terhubung";
+                statusElem.style.color = "#10b981";
+            }
+            if (statusDot) {
+                statusDot.style.backgroundColor = "#10b981";
+            }
+
+            if (data) {
+                const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                // Update pH
+                if (data.ph !== undefined) {
+                    const ph = parseFloat(data.ph);
+                    document.getElementById('phText').innerText = ph.toFixed(2);
+                    phGaugeChart.data.datasets[0].data = [ph, Math.max(0, 14 - ph)];
+                    phGaugeChart.update();
+                }
+
+                // Update TDS
+                if (data.tds !== undefined) {
+                    const tds = parseFloat(data.tds);
+                    document.getElementById('tdsText').innerText = Math.round(tds) + " PPM";
+                    tdsGaugeChart.data.datasets[0].data = [Math.min(tds, 2000), Math.max(0, 2000 - Math.min(tds, 2000))];
+                    tdsGaugeChart.update();
+                }
+
+                // Update Line Chart secara Sinkron
+                if (data.ph !== undefined && data.tds !== undefined) {
+                    sensorChart.data.labels.push(timeNow);
+                    sensorChart.data.datasets[0].data.push(parseFloat(data.ph));
+                    sensorChart.data.datasets[1].data.push(parseFloat(data.tds));
+
+                    if (sensorChart.data.labels.length > 8) {
+                        sensorChart.data.labels.shift();
+                        sensorChart.data.datasets[0].data.shift();
+                        sensorChart.data.datasets[1].data.shift();
+                    }
+                    sensorChart.update();
+                }
+
+                document.getElementById('last-update').innerText = timeNow;
+
+                // Sinkronisasi status sakelar
+                if (data.relays) {
+                    for (let i = 1; i <= 4; i++) {
+                        const rToggle = document.getElementById('relay' + i);
+                        if (rToggle && data.relays['relay' + i] !== undefined) {
+                            rToggle.checked = Boolean(data.relays['relay' + i]);
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
