@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "author": "SMKN 2 Yogyakarta - Sucodeponik IoT",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 100, "left": 100, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot_ph", "top": -90, "left": -120, "attrs": { "label": "Sensor pH" } },
+    { "type": "wokwi-potentiometer", "id": "pot_tds", "top": 20, "left": -120, "attrs": { "label": "Sensor TDS" } },
+    { "type": "wokwi-dht22", "id": "dht", "top": -120, "left": 260, "attrs": { "temperature": "27.5", "humidity": "65" } },
+    { "type": "wokwi-hc-sr04", "id": "ultrasonic", "top": -120, "left": 420, "attrs": { "distance": "5" } },
+    { "type": "wokwi-led", "id": "led_ph_up", "top": 360, "left": -60, "attrs": { "color": "green", "label": "Pompa pH Up" } },
+    { "type": "wokwi-led", "id": "led_ph_down", "top": 360, "left": 40, "attrs": { "color": "red", "label": "Pompa pH Down" } },
+    { "type": "wokwi-led", "id": "led_nutrisi_a", "top": 360, "left": 140, "attrs": { "color": "yellow", "label": "Pompa Nutrisi A" } },
+    { "type": "wokwi-led", "id": "led_nutrisi_b", "top": 360, "left": 240, "attrs": { "color": "blue", "label": "Pompa Nutrisi B" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": 420, "left": -60, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r2", "top": 420, "left": 40, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r3", "top": 420, "left": 140, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r4", "top": 420, "left": 240, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$if:serial:RX", "", [] ],
+    [ "esp:RX", "$if:serial:TX", "", [] ],
+
+    [ "esp:3V3", "pot_ph:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "pot_ph:GND", "black", [ "v0" ] ],
+    [ "esp:34", "pot_ph:SIG", "green", [ "v0" ] ],
+
+    [ "esp:3V3", "pot_tds:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "pot_tds:GND", "black", [ "v0" ] ],
+    [ "esp:35", "pot_tds:SIG", "orange", [ "v0" ] ],
+
+    [ "esp:3V3", "dht:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.2", "dht:GND", "black", [ "v0" ] ],
+    [ "esp:15", "dht:SDA", "yellow", [ "v0" ] ],
+
+    [ "esp:5V", "ultrasonic:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.2", "ultrasonic:GND", "black", [ "v0" ] ],
+    [ "esp:5", "ultrasonic:TRIG", "purple", [ "v0" ] ],
+    [ "esp:18", "ultrasonic:ECHO", "blue", [ "v0" ] ],
+
+    [ "esp:25", "led_ph_up:A", "green", [ "v0" ] ],
+    [ "led_ph_up:C", "r1:1", "black", [ "v0" ] ],
+    [ "r1:2", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:26", "led_ph_down:A", "red", [ "v0" ] ],
+    [ "led_ph_down:C", "r2:1", "black", [ "v0" ] ],
+    [ "r2:2", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:27", "led_nutrisi_a:A", "yellow", [ "v0" ] ],
+    [ "led_nutrisi_a:C", "r3:1", "black", [ "v0" ] ],
+    [ "r3:2", "esp:GND.1", "black", [ "v0" ] ],
+
+    [ "esp:14", "led_nutrisi_b:A", "blue", [ "v0" ] ],
+    [ "led_nutrisi_b:C", "r4:1", "black", [ "v0" ] ],
+    [ "r4:2", "esp:GND.1", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
